@@ -7,18 +7,30 @@ var exec = require('child_process').exec
 var path = require('path')
 var fs = require('fs')
 
-var packageJSON = JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf-8'))
+var packageJSON = JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf-8'));
 
 var checkForDependencies = function(callback) {
-    exec('which npm', function(err, stdout, stderr) {
-        if (err) {
-            console.error('Could not find `npm` command. Is npm installed?')
-            process.exit(-1)
-        } else {
-            callback()
-        }
-    })
-}
+    if(process.platform == 'linux'){
+	    exec('which npm', function(err, stdout, stderr) {
+        	if (err) {
+            	console.error('Could not find `npm` command. Is npm installed?');
+            	process.exit(-1);
+        	} else {
+            	callback();
+        	}
+    	});
+    }
+    if(process.platform == 'win32'){
+	    exec('npm -v', function(err, stdout, stderr) {
+        	if (err) {
+            	console.error('Could not find `npm` command. Is npm installed?');
+            	process.exit(-1);
+        	} else {
+            	callback();
+        	}
+    	});
+    }
+};
 
 program
     .version(packageJSON.version)
@@ -27,7 +39,7 @@ program
     .option('-u, --username <username>', 'require a username for authentication')
     .option('-P, --password <password>', 'require a password for authentication')
     .option('-d, --no-downgrade', 'do not downgrade, force run as root (must already be root)')
-    .option('-b, --no-browser', 'do not attempt to launch the default browser')
+    .option('-b, --no-browser', 'do not attempt to launch the default browser');
 program
     .command('init [directory]')
     .description('Initialize a new project and listen for connections.')
@@ -42,7 +54,7 @@ program
         project.init()
         project.start()
         server.listen(program.port || process.env.PORT || 8123, program.host, program.username, password, program.downgrade, program.browser)
-    })})
+    })});
 
 program
     .command('listen [directory]')
@@ -53,7 +65,7 @@ program
         project.chdir(dir)
         project.start()
         server.listen(program.port || process.env.PORT || 8123, program.host, program.username, password, program.downgrade, program.browser)
-    })})
+    })});
 
 if (process.argv.length > 2) {
     if (process.argv[2].charAt(0) == '-') {

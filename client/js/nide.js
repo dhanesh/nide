@@ -1,9 +1,9 @@
 var ui, connection;
 
 $(function() {
-    connection = new ServerConnection()
-    ui = new UserInterfaceController()
-})
+    connection = new ServerConnection();
+    ui = new UserInterfaceController();
+});
 
-var cwd = ''
-var nodeVersion = 'v0.4.11'
+var cwd = '';
+var nodeVersion = 'v0.4.11';

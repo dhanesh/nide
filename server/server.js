@@ -1,7 +1,7 @@
 var express = require('express');
-var sockeio = require('socket.io')
-var project = require('./project.js')
-var child_process = require('child_process')
+var sockeio = require('socket.io');
+var project = require('./project.js');
+var child_process = require('child_process');
 
 var server = express.createServer();
 var staticServer = express.createServer();
@@ -58,14 +58,16 @@ exports.listen = function(port, host, username, password, downgrade, launchBrows
     server.listen(port, host, function() {
         staticServer.listen(port+1, host, function() {
             // if run as root, downgrade to the owner of this file
-            if (process.getuid() === 0) {
+            if(process.platform == 'linux'){
+              if (process.getuid() === 0) {
                 if(downgrade == true){
-                    require('fs').stat(__filename, function(err, stats) {
-                    if (err) return console.log(err)
-                    process.setuid(stats.uid);
-                    });
-                }
-            }
+                 	require('fs').stat(__filename, function(err, stats) {
+                  	if (err) return console.log(err)
+                  	process.setuid(stats.uid);
+                	});
+              	}
+          		}
+	          }
         });
     });
     
@@ -105,7 +107,12 @@ exports.listen = function(port, host, username, password, downgrade, launchBrows
           default: browser = "xdg-open"; break;
         }
         // if this fails, it'll just exit with a non-zero code.
-        child_process.spawn(browser, [nideUrl]);
+        if(process.platform == 'linux' || process.platform == 'darwin'){
+          child_process.spawn(browser, [nideUrl]);
+        }
+        if(process.platform == 'win32'){
+          child_process.exec(browser + ' ' + nideUrl);
+        }
     }
 
     io.sockets.on('connection', function(socket) {
